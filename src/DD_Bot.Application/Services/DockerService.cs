@@ -105,6 +105,15 @@ namespace DD_Bot.Application.Services
         {
             await _client.Containers.RestartContainerAsync(id, new ContainerRestartParameters());
         }
+
+        public async void DockerCommandExec(string id, string command)
+        {            
+            var cliCommands = new ContainerExecCreateParameters(){Cmd=new List<string>(){command}};
+
+            // private ContainerExecCreateParameters params = new ContainerExecCreateParameters(;
+
+            await _client.Exec.ExecCreateContainerAsync(id, cliCommands);
+        }
         
         public void Start()
         {

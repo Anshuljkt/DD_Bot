@@ -72,6 +72,11 @@ namespace DD_Bot.Application.Commands
                         Name = "restart",
                         Value ="restart",
                     },
+                    new ApplicationCommandOptionChoiceProperties()
+                    {
+                        Name = "exec",
+                        Value = "exec"
+                    }
                 });
 
             return builder.Build();
@@ -124,6 +129,7 @@ namespace DD_Bot.Application.Commands
                         break;
                     case "stop":
                     case "restart":
+                    case "exec":
                         if (settings.UserStopPermissions.ContainsKey(arg.User.Id))
                         {
                             if (settings.UserStopPermissions[arg.User.Id].Contains(dockerName))
@@ -174,6 +180,7 @@ namespace DD_Bot.Application.Commands
             switch (command)
             {
                 case "start":
+                case "exec":
                     if (dockerService.RunningDockers.Contains(dockerName))
                     {
                         await arg.ModifyOriginalResponseAsync(edit => edit.Content = string.Format(dockerName + " is already running"));
@@ -200,6 +207,9 @@ namespace DD_Bot.Application.Commands
                     break;
                case "restart":
                    dockerService.DockerCommandRestart(dockerId);
+                    break;
+               case "exec": 
+                   dockerService.DockerCommandExec(dockerId, "fail2ban-client unban 152.44.141.6");
                     break;
             }
 
