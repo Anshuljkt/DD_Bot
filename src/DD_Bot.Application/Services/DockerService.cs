@@ -108,7 +108,18 @@ namespace DD_Bot.Application.Services
 
         public async void DockerCommandExec(string id, string command)
         {            
-            var cliCommands = new ContainerExecCreateParameters(){Cmd=new List<string>(){command}};
+            var cliCommands = new ContainerExecCreateParameters(){
+                AttachStderr = true,
+                AttachStdin = true,
+                AttachStdout = true,
+                Cmd = new string[] { command },
+                // Cmd = new List<string>(){ "env", "TERM=xterm-256color", "bash" }
+                // Cmd = new List<string>() {command}
+                Detach = true,
+                Tty = false,
+                User = "root",
+                Privileged = true
+            };
 
             // private ContainerExecCreateParameters params = new ContainerExecCreateParameters(;
 

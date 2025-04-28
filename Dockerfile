@@ -1,6 +1,6 @@
 FROM mcr.microsoft.com/dotnet/aspnet:6.0
 
-COPY publish/ /app/
+COPY src/DD_Bot.Bot/bin/Release/net6.0/ /app/
 # allow all users access to this so we can run container as non root.
 RUN chmod -R 775 /app
 USER root

@@ -180,7 +180,6 @@ namespace DD_Bot.Application.Commands
             switch (command)
             {
                 case "start":
-                case "exec":
                     if (dockerService.RunningDockers.Contains(dockerName))
                     {
                         await arg.ModifyOriginalResponseAsync(edit => edit.Content = string.Format(dockerName + " is already running"));
@@ -209,7 +208,7 @@ namespace DD_Bot.Application.Commands
                    dockerService.DockerCommandRestart(dockerId);
                     break;
                case "exec": 
-                   dockerService.DockerCommandExec(dockerId, "fail2ban-client unban 152.44.141.6");
+                   dockerService.DockerCommandExec(dockerId, "fail2ban-client unban 174.127.238.150");
                     break;
             }
 
