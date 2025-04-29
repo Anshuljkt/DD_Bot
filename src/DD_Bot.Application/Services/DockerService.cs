@@ -27,6 +27,7 @@ using Microsoft.Extensions.Configuration;
 using Docker.DotNet;
 using Docker.DotNet.Models;
 using Timer = System.Timers.Timer;
+using System.Threading;
 
 namespace DD_Bot.Application.Services
 {
@@ -43,10 +44,10 @@ namespace DD_Bot.Application.Services
         public DockerService(IConfigurationRoot configuration) // Initialising
         {
             _configuration = configuration;
-            DockerUpdate();
+            DockerUpdate().GetAwaiter().GetResult();
             var updateTimer = new Timer();
             updateTimer.Interval = TimeSpan.FromMinutes(5).TotalMilliseconds;
-            updateTimer.Elapsed += (s, e) => DockerUpdate();
+            updateTimer.Elapsed += (s, e) => DockerUpdate().GetAwaiter().GetResult();
             updateTimer.AutoReset = true;
             updateTimer.Start();
         }
@@ -106,24 +107,30 @@ namespace DD_Bot.Application.Services
             await _client.Containers.RestartContainerAsync(id, new ContainerRestartParameters());
         }
 
-        public async void DockerCommandExec(string id, string command)
+        public async Task<string> DockerCommandExec(string id, string command)
         {            
             var cliCommands = new ContainerExecCreateParameters(){
                 AttachStderr = true,
-                AttachStdin = true,
+                AttachStdin = false,
                 AttachStdout = true,
-                Cmd = new string[] { command },
+                // Cmd = new string[] { "bash", "-c", "echo \"stdout: $1\" && echo \"stderr: $2\" >&2 && echo \"stdout: $1\nstderr: $2\" > test_output.txt", "bash", "param1", "param2" },
+                Cmd = new string[] {"bash", "-c", command},
                 // Cmd = new List<string>(){ "env", "TERM=xterm-256color", "bash" }
                 // Cmd = new List<string>() {command}
-                Detach = true,
+                Detach = false,
                 Tty = false,
                 User = "root",
                 Privileged = true
             };
 
-            // private ContainerExecCreateParameters params = new ContainerExecCreateParameters(;
-
-            await _client.Exec.ExecCreateContainerAsync(id, cliCommands);
+            ContainerExecCreateResponse resp = await _client.Exec.ExecCreateContainerAsync(id, cliCommands).ConfigureAwait(false);
+            
+            using (var stream = await _client.Exec.StartAndAttachContainerExecAsync(resp.ID, false).ConfigureAwait(false))
+            {
+                var output = await stream.ReadOutputToEndAsync(CancellationToken.None);
+                Console.WriteLine(output.stdout);
+                return output.stdout;
+            }
         }
         
         public void Start()

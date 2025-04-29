@@ -24,6 +24,7 @@ using DD_Bot.Application.Services;
 using System.Linq;
 using System.Threading;
 using DD_Bot.Domain;
+using System.Threading.Tasks;
 
 namespace DD_Bot.Application.Commands
 {
@@ -93,6 +94,7 @@ namespace DD_Bot.Application.Commands
             
             var command = arg.Data.Options.FirstOrDefault(option => option.Name == "command")?.Value as string;
             var dockerName = arg.Data.Options.FirstOrDefault(option => option.Name == "dockername")?.Value as string;
+            Task<string> execOutput = null;
 
             #region authCheck
 
@@ -208,7 +210,7 @@ namespace DD_Bot.Application.Commands
                    dockerService.DockerCommandRestart(dockerId);
                     break;
                case "exec": 
-                   dockerService.DockerCommandExec(dockerId, "fail2ban-client unban 174.127.238.150");
+                   execOutput = dockerService.DockerCommandExec(dockerId, "cd usr && ./scr.sh -o aaaa -e eeeeee");
                     break;
             }
 
@@ -252,6 +254,16 @@ namespace DD_Bot.Application.Commands
                         {
                             break;
                         }
+                    case "exec":
+                        if (execOutput != null && execOutput.IsCompleted) 
+                        {
+                            await arg.ModifyOriginalResponseAsync(edit => edit.Content = arg.User.Mention + execOutput.Result);
+                            return;
+                        }
+                        else 
+                        {
+                            break;
+                        }                    
                 }
             }
             
