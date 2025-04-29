@@ -132,6 +132,117 @@ namespace DD_Bot.Application.Services
                 return output.stdout;
             }
         }
+
+        public async Task<string> DockerCustomCommandJFFix() {
+            var output = new System.Text.StringBuilder();
+            
+            // Define container names
+            var containers = new[] { "jellyfin", "jellystat", "jellystat-db" };
+            
+            // Stop containers
+            output.AppendLine("Stopping containers...");
+            foreach (var container in containers)
+            {
+                var docker = DockerStatus.FirstOrDefault(d => d.Names[0] == container);
+                if (docker != null)
+                {
+                    DockerCommandStop(docker.ID);
+                }
+            }
+            
+            // Wait for containers to stop with retries
+            for (int i = 0; i < Settings.Retries; i++)
+            {
+                await Task.Delay(TimeSpan.FromSeconds(Settings.TimeBeforeRetry));
+                await DockerUpdate();
+                
+                bool allStopped = true;
+                foreach (var container in containers)
+                {
+                    if (RunningDockers.Contains(container))
+                    {
+                        allStopped = false;
+                        break;
+                    }
+                }
+                
+                if (allStopped)
+                {
+                    output.AppendLine("All containers stopped successfully.");
+                    break;
+                }
+            }
+            
+            // Start Jellyfin first
+            output.AppendLine("Starting Jellyfin...");
+            var jellyfin = DockerStatus.FirstOrDefault(d => d.Names[0] == "jellyfin");
+            if (jellyfin != null)
+            {
+                DockerCommandStart(jellyfin.ID);
+                
+                // Wait for Jellyfin to start with retries
+                for (int i = 0; i < Settings.Retries; i++)
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(Settings.TimeBeforeRetry));
+                    await DockerUpdate();
+                    
+                    if (RunningDockers.Contains("jellyfin"))
+                    {
+                        output.AppendLine("Jellyfin started successfully.");
+                        break;
+                    }
+                }
+            }
+            
+            // Start Jellystat and Jellystat-db
+            output.AppendLine("Starting Jellystat and Jellystat-db...");
+            var jellystat = DockerStatus.FirstOrDefault(d => d.Names[0] == "jellystat");
+            var jellystatDb = DockerStatus.FirstOrDefault(d => d.Names[0] == "jellystat-db");
+            
+            if (jellystat != null) DockerCommandStart(jellystat.ID);
+            if (jellystatDb != null) DockerCommandStart(jellystatDb.ID);
+            
+            // Wait for Jellystat and Jellystat-db to start with retries
+            for (int i = 0; i < Settings.Retries; i++)
+            {
+                await Task.Delay(TimeSpan.FromSeconds(Settings.TimeBeforeRetry));
+                await DockerUpdate();
+                
+                bool allStarted = true;
+                if (jellystat != null && !RunningDockers.Contains("jellystat")) allStarted = false;
+                if (jellystatDb != null && !RunningDockers.Contains("jellystat-db")) allStarted = false;
+                
+                if (allStarted)
+                {
+                    output.AppendLine("Jellystat and Jellystat-db started successfully.");
+                    break;
+                }
+            }
+            
+            // Restart Promtail
+            output.AppendLine("Restarting Promtail...");
+            var promtail = DockerStatus.FirstOrDefault(d => d.Names[0] == "promtail");
+            if (promtail != null)
+            {
+                DockerCommandRestart(promtail.ID);
+                
+                // Wait for Promtail to restart with retries
+                for (int i = 0; i < Settings.Retries; i++)
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(Settings.TimeBeforeRetry));
+                    await DockerUpdate();
+                    
+                    if (RunningDockers.Contains("promtail"))
+                    {
+                        output.AppendLine("Promtail restarted successfully.");
+                        break;
+                    }
+                }
+            }
+            
+            output.AppendLine("All operations completed.");
+            return output.ToString();
+        }
         
         public void Start()
         {

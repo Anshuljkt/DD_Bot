@@ -52,33 +52,23 @@ namespace DD_Bot.Application.Commands
                     "choose a container",
                     true);
 
-            builder.AddOption("command",
-                ApplicationCommandOptionType.String, 
-                "choose a command", 
-                true, 
-                choices: new[]
-                {
-                    new ApplicationCommandOptionChoiceProperties()
-                    {
-                        Name = "start",
-                        Value ="start",
-                    },
-                    new ApplicationCommandOptionChoiceProperties()
-                    {
-                        Name = "stop",
-                        Value ="stop",
-                    },
-                    new ApplicationCommandOptionChoiceProperties()
-                    {
-                        Name = "restart",
-                        Value ="restart",
-                    },
-                    new ApplicationCommandOptionChoiceProperties()
-                    {
-                        Name = "exec",
-                        Value = "exec"
-                    }
-                });
+            builder.AddOption(new SlashCommandOptionBuilder()
+                .WithName("command")
+                .WithDescription("choose a command")
+                .WithType(ApplicationCommandOptionType.String)
+                .WithRequired(true)
+                .AddChoice("start", "start")
+                .AddChoice("stop", "stop")
+                .AddChoice("restart", "restart")
+                .AddChoice("exec", "exec")
+                .AddChoice("jfFix", "jfFix")
+            );
+
+            // Add cli parameter that's only required when command is "exec"
+            builder.AddOption("cli",
+                ApplicationCommandOptionType.String,
+                "command to execute in the container",
+                isRequired: false);
 
             return builder.Build();
         }
@@ -92,9 +82,15 @@ namespace DD_Bot.Application.Commands
             await arg.RespondAsync("Contacting Docker Service...");
             await dockerService.DockerUpdate();
             
-            var command = arg.Data.Options.FirstOrDefault(option => option.Name == "command")?.Value as string;
-            var dockerName = arg.Data.Options.FirstOrDefault(option => option.Name == "dockername")?.Value as string;
+            string command = arg.Data.Options.FirstOrDefault(option => option.Name == "command")?.Value as string;
+            string dockerName = arg.Data.Options.FirstOrDefault(option => option.Name == "dockername")?.Value as string;
+            string cliCommand = arg.Data.Options.FirstOrDefault(option => option.Name == "cli")?.Value as string;
             Task<string> execOutput = null;
+
+            if (command.Equals("jfFix")) {
+                command = "jfFix";
+                dockerName = "jellyfin";
+            }
 
             #region authCheck
 
@@ -132,6 +128,7 @@ namespace DD_Bot.Application.Commands
                     case "stop":
                     case "restart":
                     case "exec":
+                    case "jfFix":
                         if (settings.UserStopPermissions.ContainsKey(arg.User.Id))
                         {
                             if (settings.UserStopPermissions[arg.User.Id].Contains(dockerName))
@@ -164,7 +161,7 @@ namespace DD_Bot.Application.Commands
 
             if (string.IsNullOrEmpty(dockerName)) //Schaut ob ein Name für den Docker eingegeben wurde
             {
-                await arg.ModifyOriginalResponseAsync(edit => edit.Content = "No name has been specified");
+                await arg.ModifyOriginalResponseAsync(edit => edit.Content = "No container has been specified");
                 return;
             }
 
@@ -173,7 +170,7 @@ namespace DD_Bot.Application.Commands
 
             if (docker == null) //Schaut ob gesuchter Docker Existiert
             {
-                await arg.ModifyOriginalResponseAsync(edit => edit.Content = "Docker doesnt exist");
+                await arg.ModifyOriginalResponseAsync(edit => edit.Content = "Container doesn't exist!");
                 return;
             }
 
@@ -210,8 +207,11 @@ namespace DD_Bot.Application.Commands
                    dockerService.DockerCommandRestart(dockerId);
                     break;
                case "exec": 
-                   execOutput = dockerService.DockerCommandExec(dockerId, "cd usr && ./scr.sh -o aaaa -e eeeeee");
+                   execOutput = dockerService.DockerCommandExec(dockerId, cliCommand);
                     break;
+               case "jfFix":
+                   execOutput = dockerService.DockerCustomCommandJFFix();
+                   break;
             }
 
             await arg.ModifyOriginalResponseAsync(edit =>
@@ -255,9 +255,10 @@ namespace DD_Bot.Application.Commands
                             break;
                         }
                     case "exec":
+                    case "jfFix":
                         if (execOutput != null && execOutput.IsCompleted) 
                         {
-                            await arg.ModifyOriginalResponseAsync(edit => edit.Content = arg.User.Mention + execOutput.Result);
+                            await arg.ModifyOriginalResponseAsync(edit => edit.Content = arg.User.Mention + " Response from Script (Stdout): \n" + execOutput.Result);
                             return;
                         }
                         else 
