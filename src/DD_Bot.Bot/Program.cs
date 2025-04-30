@@ -27,7 +27,7 @@ using DD_Bot.Application.Services;
 using DD_Bot.Domain;
 using Newtonsoft.Json;
 
-string version = "1.1.0";
+string version = "1.1.1";
 
 Console.WriteLine("DD_Bot, Version "+ version);
 
