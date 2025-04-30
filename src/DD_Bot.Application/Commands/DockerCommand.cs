@@ -79,7 +79,7 @@ namespace DD_Bot.Application.Commands
 
         public static async void Execute(SocketSlashCommand arg, DockerService dockerService, DiscordSettings settings)
         {
-            await arg.RespondAsync("Contacting Docker Service...");
+            await arg.DeferAsync();
             await dockerService.DockerUpdate();
             
             string command = arg.Data.Options.FirstOrDefault(option => option.Name == "command")?.Value as string;

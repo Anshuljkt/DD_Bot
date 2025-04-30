@@ -78,7 +78,7 @@ namespace DD_Bot.Application.Commands
 
         public static async void Execute(SocketSlashCommand arg, Settings settings, SettingsService settingsService)
         {
-            await arg.RespondAsync("Contacting Settings Service...");
+            await arg.DeferAsync();
             DiscordSettings discordSettings = settings.DiscordSettings;
             if (!discordSettings.AdminIDs.Contains(arg.User.Id))
             {
