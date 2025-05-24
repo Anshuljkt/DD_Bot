@@ -45,7 +45,7 @@ namespace DD_Bot.Application.Services
             File.WriteAllText(_settingsPath, JsonConvert.SerializeObject(settings, Formatting.Indented));
         }
         
-        public async Task Start()
+        public static void Start()
         {
             Console.WriteLine("SettingsService started");
         }

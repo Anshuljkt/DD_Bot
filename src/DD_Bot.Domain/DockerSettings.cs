@@ -21,8 +21,8 @@ namespace DD_Bot.Domain
 {
     public class DockerSettings 
     {
-        public string BotName { get; set; } = "DD_Bot";
-        public int Retries { get; set; } = 6;
+        public string BotName { get; set; } = "dd-bot-advanced";
+        public int Retries { get; set; } = 12;
         public int TimeBeforeRetry { get; set; } = 5;
         public int ContainersPerMessage { get; set; } = 30;
     }

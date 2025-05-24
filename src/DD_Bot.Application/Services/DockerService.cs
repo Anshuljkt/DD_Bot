@@ -92,17 +92,17 @@ namespace DD_Bot.Application.Services
             return counter;
         }
 
-        public async void DockerCommandStart(string id)
+        public async Task DockerCommandStart(string id)
         {
             await _client.Containers.StartContainerAsync(id, new ContainerStartParameters());
         }
 
-        public async void DockerCommandStop(string id)
+        public async Task DockerCommandStop(string id)
         {
             await _client.Containers.StopContainerAsync(id, new ContainerStopParameters());
         }
 
-        public async void DockerCommandRestart(string id)
+        public async Task DockerCommandRestart(string id)
         {
             await _client.Containers.RestartContainerAsync(id, new ContainerRestartParameters());
         }
@@ -148,7 +148,7 @@ namespace DD_Bot.Application.Services
                 if (docker != null)
                 {
                     Console.WriteLine($"Stopping {container}...");
-                    DockerCommandStop(docker.ID);
+                    await DockerCommandStop(docker.ID);
                 }
             }
             
@@ -185,7 +185,7 @@ namespace DD_Bot.Application.Services
             var jellyfin = DockerStatus.FirstOrDefault(d => d.Names[0] == "jellyfin");
             if (jellyfin != null)
             {
-                DockerCommandStart(jellyfin.ID);
+                await DockerCommandStart(jellyfin.ID);
                 
                 // Wait for Jellyfin to start with retries
                 Console.WriteLine("Waiting for Jellyfin to start...");
@@ -213,12 +213,12 @@ namespace DD_Bot.Application.Services
             if (jellystat != null) 
             {
                 Console.WriteLine("Starting Jellystat...");
-                DockerCommandStart(jellystat.ID);
+                await DockerCommandStart(jellystat.ID);
             }
             if (jellystatDb != null) 
             {
                 Console.WriteLine("Starting Jellystat-db...");
-                DockerCommandStart(jellystatDb.ID);
+                await DockerCommandStart(jellystatDb.ID);
             }
             
             // Wait for Jellystat and Jellystat-db to start with retries
@@ -255,7 +255,7 @@ namespace DD_Bot.Application.Services
             var promtail = DockerStatus.FirstOrDefault(d => d.Names[0] == "promtail");
             if (promtail != null)
             {
-                DockerCommandRestart(promtail.ID);
+                await DockerCommandRestart(promtail.ID);
                 
                 // Wait for Promtail to restart with retries
                 Console.WriteLine("Waiting for Promtail to restart...");
@@ -278,9 +278,10 @@ namespace DD_Bot.Application.Services
             output.AppendLine("All operations completed.");
             return output.ToString();
         }
-        
+
         public async Task Start()
         {
+            await DockerUpdate();
             Console.WriteLine("DockerService started");
         }
     }

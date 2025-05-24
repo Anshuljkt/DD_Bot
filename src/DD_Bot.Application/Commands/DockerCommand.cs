@@ -198,13 +198,13 @@ namespace DD_Bot.Application.Commands
             switch (command)
             {
                case "start":
-                   dockerService.DockerCommandStart(dockerId);
+                   await dockerService.DockerCommandStart(dockerId);
                     break;
                case "stop":
-                   dockerService.DockerCommandStop(dockerId);
+                   await dockerService.DockerCommandStop(dockerId);
                     break;
                case "restart":
-                   dockerService.DockerCommandRestart(dockerId);
+                   await dockerService.DockerCommandRestart(dockerId);
                     break;
                case "exec": 
                    execOutput = dockerService.DockerCommandExec(dockerId, cliCommand);
@@ -219,7 +219,7 @@ namespace DD_Bot.Application.Commands
 
             for (int i = 0; i < dockerService.Settings.Retries; i++)
             {
-                Thread.Sleep(TimeSpan.FromSeconds(dockerService.Settings.TimeBeforeRetry));
+                await Task.Delay(TimeSpan.FromSeconds(dockerService.Settings.TimeBeforeRetry));
                 await dockerService.DockerUpdate();
                 
                 switch (command)

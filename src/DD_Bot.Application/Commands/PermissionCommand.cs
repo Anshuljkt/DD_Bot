@@ -80,8 +80,8 @@ namespace DD_Bot.Application.Commands
                 return;
             }
 
-            List<string> startPermissions = new List<string>();
-            List<string> stopPermissions = new List<string>();
+            List<string> startPermissions = new();
+            List<string> stopPermissions = new();
 
             string listOwner;
             

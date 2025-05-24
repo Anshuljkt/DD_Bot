@@ -27,9 +27,9 @@ using DD_Bot.Application.Services;
 using DD_Bot.Domain;
 using Newtonsoft.Json;
 
-string version = "1.1.4";
+string version = "1.2.0";
 
-Console.WriteLine("DD_Bot, Version "+ version);
+Console.WriteLine("DD_Bot, Version " + version);
 
 #region CreateSettingsFiles
 var settingsDirectory = Path.Combine(Directory.GetCurrentDirectory(), "settings");
@@ -91,6 +91,7 @@ var settingsService = serviceProvider.GetRequiredService<ISettingsService>() as 
 if (settingsService == null) throw new ArgumentNullException(nameof(settingsService));
 var discordBot = serviceProvider.GetRequiredService<IDiscordService>() as DiscordService;
 if (discordBot == null) throw new ArgumentNullException(nameof(discordBot));
+
+SettingsService.Start();
 await discordBot.Start();
 await dockerService.Start();
-await settingsService.Start();
