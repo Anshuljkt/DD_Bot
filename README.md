@@ -6,6 +6,7 @@ docker buildx build \
 --push \
 --platform linux/amd64,linux/arm64 \
 --tag anshuljkt1/dd-bot-advanced:latest \
+--tag anshuljkt1/dd-bot-advanced:1.1.6 \
 .
 
 
