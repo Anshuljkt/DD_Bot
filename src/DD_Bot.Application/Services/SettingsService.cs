@@ -23,6 +23,7 @@ using System.Threading;
 using DD_Bot.Application.Interfaces;
 using DD_Bot.Domain;
 using Newtonsoft.Json;
+using System.Threading.Tasks;
 
 namespace DD_Bot.Application.Services
 {
@@ -44,7 +45,7 @@ namespace DD_Bot.Application.Services
             File.WriteAllText(_settingsPath, JsonConvert.SerializeObject(settings, Formatting.Indented));
         }
         
-        public void Start()
+        public async Task Start()
         {
             Console.WriteLine("SettingsService started");
         }

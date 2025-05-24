@@ -91,6 +91,6 @@ var settingsService = serviceProvider.GetRequiredService<ISettingsService>() as 
 if (settingsService == null) throw new ArgumentNullException(nameof(settingsService));
 var discordBot = serviceProvider.GetRequiredService<IDiscordService>() as DiscordService;
 if (discordBot == null) throw new ArgumentNullException(nameof(discordBot));
-discordBot.Start();
-dockerService.Start();
-settingsService.Start();
+await discordBot.Start();
+await dockerService.Start();
+await settingsService.Start();

@@ -279,7 +279,7 @@ namespace DD_Bot.Application.Services
             return output.ToString();
         }
         
-        public void Start()
+        public async Task Start()
         {
             Console.WriteLine("DockerService started");
         }
