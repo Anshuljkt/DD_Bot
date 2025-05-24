@@ -40,7 +40,8 @@ namespace DD_Bot.Application.Services
         {
             var discordSocketConfig = new DiscordSocketConfig
             {
-                GatewayIntents = GatewayIntents.Guilds | GatewayIntents.GuildMessages
+                GatewayIntents = GatewayIntents.Guilds | GatewayIntents.GuildMessages,
+                DefaultRetryMode = RetryMode.AlwaysRetry
             };
 
             _configuration = configuration;
@@ -62,10 +63,7 @@ namespace DD_Bot.Application.Services
             _discordClient.SlashCommandExecuted += DiscordClient_SlashCommandExecuted;
             _discordClient.LoginAsync(TokenType.Bot, Setting.DiscordSettings.Token);
             _discordClient.StartAsync();
-            while (true)
-            {
-                Thread.Sleep(1000);
-            }
+            Task.Delay(-1).Wait(); // Keeps the app alive indefinitely
             // ReSharper disable once FunctionNeverReturns
         }
 
