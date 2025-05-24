@@ -25,6 +25,7 @@ using Discord.WebSocket;
 using DD_Bot.Application.Services;
 using System.Linq;
 using DD_Bot.Domain;
+using System.Threading.Tasks;
 
 
 namespace DD_Bot.Application.Commands
@@ -104,7 +105,7 @@ namespace DD_Bot.Application.Commands
 
         #region ExecuteCommand
 
-        public static async void Execute(SocketSlashCommand arg, Settings settings, SettingsService settingsService)
+        public static async Task Execute(SocketSlashCommand arg, Settings settings, SettingsService settingsService)
         {
             await arg.RespondAsync("Contacting Settings Service");
             DiscordSettings discordSettings = settings.DiscordSettings;

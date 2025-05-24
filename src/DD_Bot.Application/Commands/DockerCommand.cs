@@ -77,7 +77,7 @@ namespace DD_Bot.Application.Commands
 
         #region ExecuteCommand
 
-        public static async void Execute(SocketSlashCommand arg, DockerService dockerService, DiscordSettings settings)
+        public static async Task Execute(SocketSlashCommand arg, DockerService dockerService, DiscordSettings settings)
         {
             await arg.DeferAsync();
             await dockerService.DockerUpdate();

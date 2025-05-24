@@ -25,6 +25,7 @@ using DD_Bot.Application.Services;
 using DD_Bot.Domain;
 using System.Linq;
 using Docker.DotNet.Models;
+using System.Threading.Tasks;
 
 namespace DD_Bot.Application.Commands
 {
@@ -51,7 +52,7 @@ namespace DD_Bot.Application.Commands
 
         #region ExecuteCommand
 
-        public static async void Execute(SocketSlashCommand arg, DockerService dockerService, DiscordSettings settings)
+        public static async Task Execute(SocketSlashCommand arg, DockerService dockerService, DiscordSettings settings)
         {
             await arg.DeferAsync();
             await dockerService.DockerUpdate();
@@ -125,10 +126,6 @@ namespace DD_Bot.Application.Commands
                         await arg.Channel.SendMessageAsync(output);
                     }
                 }
-
-
-
-                //arg.Channel.SendMessageAsync("");
             }
             else
             {

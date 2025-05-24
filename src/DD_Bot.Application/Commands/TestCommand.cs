@@ -17,6 +17,7 @@
 
 */
 
+using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 
@@ -48,7 +49,7 @@ namespace DD_Bot.Application.Commands
 
         #region ExecuteCommand
 
-        public static async void Execute(SocketSlashCommand arg)
+        public static async Task Execute(SocketSlashCommand arg)
         {
             //arg.Channel.SendMessageAsync("Pong!");
             //Do Stuff

@@ -24,6 +24,7 @@ using Discord;
 using Discord.WebSocket;
 using System.Linq;
 using DD_Bot.Domain;
+using System.Threading.Tasks;
 
 namespace DD_Bot.Application.Commands
 {
@@ -66,7 +67,7 @@ namespace DD_Bot.Application.Commands
 
         #region ExecuteCommand
 
-        public static async void Execute(SocketSlashCommand arg, Settings settings)
+        public static async Task Execute(SocketSlashCommand arg, Settings settings)
         {
             await arg.RespondAsync("Contacting Settings Service");
             var user = arg.Data.Options.FirstOrDefault(option => option.Name == "user")?.Value as SocketGuildUser;

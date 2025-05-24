@@ -41,7 +41,8 @@ namespace DD_Bot.Application.Services
             var discordSocketConfig = new DiscordSocketConfig
             {
                 GatewayIntents = GatewayIntents.Guilds | GatewayIntents.GuildMessages,
-                DefaultRetryMode = RetryMode.AlwaysRetry
+                DefaultRetryMode = RetryMode.AlwaysRetry,
+                LogLevel = LogSeverity.Info
             };
 
             _configuration = configuration;
@@ -54,46 +55,45 @@ namespace DD_Bot.Application.Services
         private DockerService Docker => _serviceProvider.GetRequiredService<IDockerService>() as DockerService;
         private SettingsService SettingService => _serviceProvider.GetRequiredService<ISettingsService>() as SettingsService;
         
-        public void Start() //Discord Start
+        public async Task Start() //Discord Start
         {
             
             _discordClient.Log += DiscordClient_Log;
             _discordClient.MessageReceived += DiscordClient_MessageReceived;
             _discordClient.GuildAvailable += DiscordClient_GuildAvailable;
             _discordClient.SlashCommandExecuted += DiscordClient_SlashCommandExecuted;
-            _discordClient.LoginAsync(TokenType.Bot, Setting.DiscordSettings.Token);
-            _discordClient.StartAsync();
-            Task.Delay(-1).Wait(); // Keeps the app alive indefinitely
+            await _discordClient.LoginAsync(TokenType.Bot, Setting.DiscordSettings.Token);
+            await _discordClient.StartAsync();
+            await Task.Delay(-1); // Keeps the app alive indefinitely
             // ReSharper disable once FunctionNeverReturns
         }
 
-        private Task DiscordClient_SlashCommandExecuted(SocketSlashCommand arg)
+        private async Task DiscordClient_SlashCommandExecuted(SocketSlashCommand arg)
         {
             switch (arg.CommandName)
             {
                 case "ping":
-                    TestCommand.Execute(arg);
-                    return Task.CompletedTask;
+                    await TestCommand.Execute(arg);
+                    break;
                 case "docker":
-                        DockerCommand.Execute(arg, Docker, Setting.DiscordSettings);
-                    return Task.CompletedTask;
+                    await DockerCommand.Execute(arg, Docker, Setting.DiscordSettings);
+                    break;
                 case "list":
-                    ListCommand.Execute(arg, Docker, Setting.DiscordSettings);
-                    return Task.CompletedTask;
+                    await ListCommand.Execute(arg, Docker, Setting.DiscordSettings);
+                    break;
                 case "admin":
-                    AdminCommand.Execute(arg, Setting, SettingService);
-                    return Task.CompletedTask;
+                    await AdminCommand.Execute(arg, Setting, SettingService);
+                    break;
                 case "user":
-                    UserCommand.Execute(arg, Setting, SettingService);
-                    return Task.CompletedTask;
+                    await UserCommand.Execute(arg, Setting, SettingService);
+                    break;
                 case "role":
-                    RoleCommand.Execute(arg, Setting, SettingService);
-                    return Task.CompletedTask;
+                    await RoleCommand.Execute(arg, Setting, SettingService);
+                    break;
                 case "permission":
-                    PermissionCommand.Execute(arg, Setting);
-                    return Task.CompletedTask;
+                    await PermissionCommand.Execute(arg, Setting);
+                    break;
             }
-            return Task.CompletedTask;
         }
 
         private async Task DiscordClient_GuildAvailable(SocketGuild guild)
