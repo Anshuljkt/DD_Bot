@@ -1,4 +1,15 @@
-<h1 align="center">DD_Bot</h1>
+Publish:
+
+cd dd-bot-advanced
+
+docker buildx build \
+--push \
+--platform linux/amd64,linux/arm64 \
+--tag anshuljkt1/dd-bot-advanced:latest \
+.
+
+
+<!-- <h1 align="center">DD_Bot</h1>
 
 <p align="center">A Discord-Bot to start and stop Docker Containers, using the Docker Socket</p>
 <p align="center">
@@ -56,4 +67,4 @@
 
 ### If you like my work, feel free to buy me a coffee
 <p>
-<br><a href="https://www.buymeacoffee.com/assaro"> <img align="left" src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" height="50" width="210" alt="assaro" /></a></p>
+<br><a href="https://www.buymeacoffee.com/assaro"> <img align="left" src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" height="50" width="210" alt="assaro" /></a></p> -->
