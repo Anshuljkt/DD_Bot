@@ -1,6 +1,30 @@
 Publish:
 
-##V2:
+## V4 AI README:
+
+## 🛠 Makefile Targets
+
+### 🔨 `make build`
+
+Builds and pushes a multi-platform Docker image using the version found in `Program.cs`.
+
+### ✏️ `make set-version VERSION=1.2.1`
+
+Updates the version string in `src/DD_Bot.Bot/Program.cs`.
+
+### 🚀 `make release VERSION=1.2.1`
+
+Performs a full release workflow:
+
+1. Updates the version in `Program.cs`
+2. Builds and pushes the Docker image with:
+   - `:latest` tag
+   - Semantic version tag (e.g., `1.2.1`)
+
+## V3:
+make release VERSION=1.2.1
+
+## V2:
 make build
 
 ## V1:
