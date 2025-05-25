@@ -199,19 +199,33 @@ namespace DD_Bot.Application.Commands
             {
                case "start":
                    await dockerService.DockerCommandStart(dockerId);
-                    break;
+                    return;
                case "stop":
                    await dockerService.DockerCommandStop(dockerId);
-                    break;
+                    return;
                case "restart":
                    await dockerService.DockerCommandRestart(dockerId);
-                    break;
+                    return;
                case "exec": 
                    execOutput = dockerService.DockerCommandExec(dockerId, cliCommand);
-                    break;
+                    return;
                case "jfFix":
-                   execOutput = dockerService.DockerCustomCommandJFFix();
-                   break;
+                    // Respond immediately
+                    await arg.ModifyOriginalResponseAsync(edit => 
+                        edit.Content = "Starting JF Fix process. This may take several minutes...");
+                        
+                    // Run the long operation in a background task
+                    _ = Task.Run(async () => {
+                        try {
+                            string result = await dockerService.DockerCustomCommandJFFix();
+                            // Send a follow-up message when complete
+                            await arg.FollowupAsync($"JF Fix completed:\n```\n{result}\n```");
+                        }
+                        catch (Exception ex) {
+                            await arg.FollowupAsync($"Error during JF Fix: {ex.Message}");
+                        }
+                    });
+                    return; // Return early, don't wait for the operation to complete
             }
 
             await arg.ModifyOriginalResponseAsync(edit =>
