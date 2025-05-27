@@ -1,0 +1,29 @@
+{
+  "name": "dd-bot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "lint": "eslint .",
+    "docker:build": "docker build -t dd-bot-js .",
+    "docker:run": "docker run -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd)/settings:/app/settings --env-file .env dd-bot-js",
+    "compose:up": "cd .. && docker-compose -f docker-compose.js.yml up -d",
+    "compose:down": "cd .. && docker-compose -f docker-compose.js.yml down",
+    "compose:logs": "cd .. && docker-compose -f docker-compose.js.yml logs -f",
+    "register-commands": "node src/register-commands.js"
+  },
+  "keywords": ["discord", "bot", "docker", "container", "management"],
+  "author": "Maxim Kovac (original), Anshul (JS port)",
+  "license": "GPL-3.0",
+  "description": "A Discord bot to control Docker containers",
+  "dependencies": {
+    "discord.js": "^14.19.3",
+    "dockerode": "^4.0.6",
+    "dotenv": "^16.5.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2",
+    "eslint": "^8.56.0"
+  }
+}
