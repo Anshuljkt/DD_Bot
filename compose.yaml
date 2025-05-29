@@ -1,17 +1,9 @@
 services:
+  # Production run of the Discord bot
   dd-bot-advanced:
+    image: anshuljkt1/dd-bot-advanced:latest
     container_name: dd-bot-advanced
     volumes:
       - ./settings:/app/settings/:rw
       - /var/run/docker.sock:/var/run/docker.sock
-    # image: assaro/ddbot:latest
-    # image: anshuljkt1/dd-bot-advanced:latest
-    build:
-      context: .
-      dockerfile: Dockerfile
     restart: unless-stopped
-#     networks:
-#       - swagSSL
-# networks:
-#   swagSSL:
-#     external: true
