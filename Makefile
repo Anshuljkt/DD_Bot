@@ -7,6 +7,7 @@ PROGRAM_FILE=src/DD_Bot.Bot/Program.cs
 VERSION ?= $(shell grep 'string version' $(PROGRAM_FILE) | sed -E 's/.*"([0-9]+\.[0-9]+\.[0-9]+)".*/\1/')
 
 TAGS=--tag $(IMAGE_NAME):latest --tag $(IMAGE_NAME):$(VERSION)
+# --tag $(IMAGE_NAME):stable
 PLATFORMS=linux/amd64,linux/arm64
 
 .PHONY: build set-version release
