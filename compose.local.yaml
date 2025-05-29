@@ -10,8 +10,3 @@ services:
       context: .
       dockerfile: Dockerfile
     restart: unless-stopped
-#     networks:
-#       - swagSSL
-# networks:
-#   swagSSL:
-#     external: true
